@@ -20,9 +20,9 @@ const Home = () => {
   return (
     <section className='max-w-7xl mx-auto '>
       <div>
-        <h1 className='font-bold text-[#000000] text-[32px] text-center' >
+        <h1 className='font-bold text-[#000000] text-[32px]' >
          The Community Showcase
-         <p className='mt-2 text-[#63717e] text-[14px] max-w-[100vw] text-center'>
+         <p className='mt-2 text-[#63717e] text-[14px] max-w-[100vw]'>
           Browse through a new realm of creation with DALL-E AI. The perfect magic to turn your creativity into reality.
          </p>
         </h1>
