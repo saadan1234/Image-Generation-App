@@ -15,7 +15,9 @@ const RenderCards = ({data, title}) => {
 const Home = () => {
   const [ loading, setLoading ] = useState(false);
   const [ allPosts, setAllPosts ] = useState(null);
-  const [searchText, setSearchText] = useState()
+  const [searchText, setSearchText] = useState('');
+  const [searchedResults, setSearchedResults] = useState(null);
+  const [searchTimeout, setsearchTimeout] = useState(null);
 
   useEffect( () => {
     const fetchPosts = async () => {
@@ -42,18 +44,36 @@ const Home = () => {
     fetchPosts();
   }, []);
 
+  const handleSearchChange = (e) => {
+    clearTimeout(searchTimeout);
+    setSearchText(e.target.value);
+    setsearchTimeout (
+      setTimeout(()=> {
+        const searchResults = allPosts.filter((item) => item.name.toLowerCase().includes(searchText.toLowerCase()) || item.prompt.toLowerCase().includes(searchText.toLowerCase()));
+        setSearchedResults(searchResults);
+      }, 500)
+    );
+  }
+
   return (
     <section className='max-w-7xl mx-auto '>
       <div>
-        <h1 className='font-bold text-[#000000] text-[32px]' >
+        <h1 className='font-bold text-[#000000] text-[32px]' ></h1>
          The Community Showcase
          <p className='mt-2 text-[#63717e] text-[14px] max-w-[100vw]'>
           Browse through a new realm of creation with DALL-E AI. The perfect magic to turn your creativity into reality.
          </p>
-        </h1>
+        
       </div>
       <div className='mt-16'>
-        <FormField />
+        <FormField 
+        labelName="Search Post" 
+        type="text"
+        name = "text"
+        placeholder="Search posts"
+        value = {searchText}
+        handleChange={handleSearchChange}
+        />
       </div>
       <div className='mt-10'>
         {loading ? (
@@ -73,7 +93,7 @@ const Home = () => {
           <div className='grid lg:grid-cols-4 sm:grid-cols-3 xs:grid-cols-2 grid-cols-1 gap-3'>
             {searchText ?  (
               <RenderCards
-              data={[]}
+              data={searchedResults}
               title="No search results found"
               />
             ) : (
