@@ -13,33 +13,72 @@ const CreatePost = () => {
   });
   const [generatingImg, setGeneratingImg] = useState(false);
   const [ loading, setLoading ] = useState(false);
-  const generatImg = () => {
-
+  const generatImg = async () => {
+    if(form.prompt){
+      try {
+        setGeneratingImg(true);
+        const response = await fetch("http://localhost:8080/api/v1/dalle", {
+          method: 'POST',
+          headers: {
+            'Content-Type' : 'application/json',
+          },
+          body: JSON.stringify({ prompt: form.prompt}),
+        })
+        const data = await response.json();
+        setForm({ ...form, photo: `data:image/jpeg;base64,${data.photo}`})
+      } catch (error) {
+        alert(error);
+      } finally {
+        setGeneratingImg(false);
+      }
+    } else {
+      alert('Please enter a prompt')
+    }
   }
-  const handleSubmit = () => {
-      setForm({ ...form, [e.target.name]: e.target.value})
-  }
+  const handleSubmit = async (e) => {
+      e.preventDefault();
+      if(form.prompt && form.photo){
+        setLoading(true);
+        try {
+          const response  = await fetch('http://localhost:8080/api/v1/post', {
+             method: 'POST' , header: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(form)
+        })
+        await response.json();
+        navigate('/');
+        } catch (error) {
+          alert(error);
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        alert("Please enter a prompt and generate an image.")
+      }
+  };
   const handleChange = (e) => {
-
-  }
+    setForm({ ...form, [e.target.name]: e.target.value})
+  };
   const handleSurpriseMe = () => {
     const randomPrompt = getRandomPrompt(form.prompt);
     setForm({ ...form, prompt: randomPrompt})
-  }
+  };
+
   return (
     <section className='max-w-7xl mx-auto'>
       <div>
         <h1 className='font-bold text-[#000000] text-[32px]' >
-         Create
+         Create</h1>
          <p className='mt-2 text-[#63717e] text-[14px] max-w-[100vw] '>
           Create your new realm of creation with DALL-E AI. The perfect magic to turn your creativity into reality.
          </p>
-        </h1>
+        
       </div>
       <form className="mt-16 max-w-3xl" onSubmit={handleSubmit}>
         <div className='flex flex-col gap-5'>
           <FormField 
-            LabelName="Your Name"
+            labelName="Your Name"
             type="text"
             name="name"
             placeholder="i.e, Mr Saadan"
@@ -47,7 +86,7 @@ const CreatePost = () => {
             handleChange={handleChange}
           />
           <FormField 
-            LabelName="Prompt"
+            labelName="Prompt"
             type="text"
             name="prompt"
             placeholder="i.e, A man walking besides an empty road. "
@@ -93,9 +132,9 @@ const CreatePost = () => {
         </div>
       </form>
     </section>
-  )
-}
+  );
+};
 
-export default CreatePost
+export default CreatePost;
 
 
